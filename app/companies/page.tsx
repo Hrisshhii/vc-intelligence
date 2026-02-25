@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import {useEffect, useMemo,useState} from "react";
@@ -7,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Table,TableBody,TableCell,TableHead,TableHeader,TableRow } from "@/components/ui/table";
 import { Card,CardContent } from "@/components/ui/card"
 import Link from "next/link";
-import { motion } from "framer-motion"
+import { motion } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 
 const PAGE_SIZE=10;
 
@@ -18,9 +20,10 @@ export default function CompaniesPage() {
   const [sortField,setSortField]=useState<keyof Company>("name");
   const [sortAsc,setSortAsc]=useState(true);
   const [page,setPage]=useState(1);
-  
+  const [searchName, setSearchName] = useState("");
+  const searchParams = useSearchParams();
+
   useEffect(()=>{
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPage(1)
   }, [search, stageFilter, industryFilter])
 
@@ -30,10 +33,10 @@ export default function CompaniesPage() {
       data=data.filter(c=>c.name.toLowerCase().includes(search.toLowerCase()));
     }
     if(stageFilter!=="All"){
-      data=data.filter(c=>c.stage===stageFilter);
+      data=data.filter(c=>c.stage.toLowerCase()===stageFilter.toLowerCase());
     }
     if(industryFilter!=="All"){
-      data=data.filter((c)=>c.industry===industryFilter)
+      data=data.filter(c=>c.industry.toLowerCase()===industryFilter.toLowerCase())
     }
     data.sort((a,b)=>{
       const valA=a[sortField];
@@ -71,6 +74,34 @@ export default function CompaniesPage() {
 
   const isFiltering=search!==""||stageFilter!="All"||industryFilter!=="All";
 
+  function saveSearch(){
+    if(!searchName.trim()) return;
+    const existing=JSON.parse(localStorage.getItem("vc-saved-searches")||"[]");
+    const newSearch={
+      id:crypto.randomUUID(),
+      name: searchName,
+      query:search,
+      filters:{
+        stage:stageFilter!=="All"?stageFilter:"",
+        industry:industryFilter!=="All"?industryFilter:"",
+      },
+      createdAt:new Date().toISOString(),
+    };
+    localStorage.setItem("vc-saved-searches",JSON.stringify([newSearch,...existing]));
+    setSearchName("");
+  };
+
+  useEffect(()=>{
+    const q=searchParams.get("q")||"";
+    const stageParam=searchParams.get("stage")||"";
+    const industryParam=searchParams.get("industry")||"";
+
+    setSearch(q);
+    setStageFilter(stageParam?stageParam:"All");
+    setIndustryFilter(industryParam?industryParam:"All");
+    setPage(1);
+  },[searchParams]);
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Companies</h1>
@@ -99,6 +130,11 @@ export default function CompaniesPage() {
           <span>{filtered.length} results</span>
         </div>
       )}
+
+      <div className="flex gap-2">
+        <Input placeholder="Save this search as..." value={searchName} onChange={e=>setSearchName(e.target.value)}/>
+        <Button onClick={saveSearch}>Save Search</Button>
+      </div>
       
 
       {filtered.length === 0?(
@@ -136,8 +172,6 @@ export default function CompaniesPage() {
           
         </div>
       )}
-
-      
 
       <div className="flex justify-between items-center">
         <Button variant="outline" disabled={page===1} onClick={()=>setPage(p=>p-1)} className="cursor-pointer">Prev</Button>
