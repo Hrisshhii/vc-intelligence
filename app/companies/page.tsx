@@ -187,7 +187,7 @@ export default function CompaniesPage() {
                   <TableHead onClick={()=>handleSort("industry")} className="p-2 text-[1.25rem] font-bold text-foreground tracking-wide uppercase cursor-pointer">Industry {sortField==="industry" && (sortAsc?"↑":"↓")}</TableHead>
                   <TableHead className="p-2 text-[1.25rem] font-bold tracking-wide uppercase text-foreground">Stage</TableHead>
                   <TableHead className="p-2 text-[1.25rem] font-bold tracking-wide uppercase text-foreground">Location</TableHead>
-                  <TableHead className="p-2 text-[1.25rem] font-bold tracking-wide uppercase text-foreground">SCORE</TableHead>
+                  <TableHead className="p-2 text-[1.25rem] font-bold tracking-wide uppercase text-foreground text-center">SCORE</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -207,7 +207,7 @@ export default function CompaniesPage() {
                       <TableCell>{company.stage}</TableCell>
                       <TableCell>{company.location}</TableCell>
 
-                      <TableCell>
+                      <TableCell className="text-center">
                         <span className={`font-semibold ${
                             result.score>70?"text-green-600"
                               :result.score>40?"text-yellow-600"
