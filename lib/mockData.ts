@@ -1,19 +1,28 @@
-export const companies = [
+export type Company = {
+  id: string
+  name: string
+  website: string
+  stage: string
+  location: string
+  industry: string
+}
+
+export const companies: Company[] = [
   {
     id: "1",
     name: "OpenAI",
     website: "https://openai.com",
     stage: "Growth",
-    location: "SF",
-    industry: "AI"
+    location: "San Francisco",
+    industry: "AI",
   },
   {
     id: "2",
     name: "Stripe",
     website: "https://stripe.com",
     stage: "Late",
-    location: "SF",
-    industry: "Fintech"
+    location: "San Francisco",
+    industry: "Fintech",
   },
   {
     id: "3",
@@ -21,6 +30,142 @@ export const companies = [
     website: "https://vercel.com",
     stage: "Growth",
     location: "Remote",
-    industry: "DevTools"
-  }
+    industry: "DevTools",
+  },
+  {
+    id: "4",
+    name: "Anthropic",
+    website: "https://anthropic.com",
+    stage: "Growth",
+    location: "San Francisco",
+    industry: "AI",
+  },
+  {
+    id: "5",
+    name: "Brex",
+    website: "https://brex.com",
+    stage: "Late",
+    location: "San Francisco",
+    industry: "Fintech",
+  },
+  {
+    id: "6",
+    name: "Scale AI",
+    website: "https://scale.com",
+    stage: "Growth",
+    location: "San Francisco",
+    industry: "AI",
+  },
+  {
+    id: "7",
+    name: "Replit",
+    website: "https://replit.com",
+    stage: "Growth",
+    location: "Remote",
+    industry: "DevTools",
+  },
+  {
+    id: "8",
+    name: "Ramp",
+    website: "https://ramp.com",
+    stage: "Growth",
+    location: "New York",
+    industry: "Fintech",
+  },
+  {
+    id: "9",
+    name: "Linear",
+    website: "https://linear.app",
+    stage: "Growth",
+    location: "Remote",
+    industry: "DevTools",
+  },
+  {
+    id: "10",
+    name: "Hugging Face",
+    website: "https://huggingface.co",
+    stage: "Growth",
+    location: "New York",
+    industry: "AI",
+  },
+  {
+    id: "11",
+    name: "Plaid",
+    website: "https://plaid.com",
+    stage: "Late",
+    location: "San Francisco",
+    industry: "Fintech",
+  },
+  {
+    id: "12",
+    name: "Retool",
+    website: "https://retool.com",
+    stage: "Growth",
+    location: "San Francisco",
+    industry: "DevTools",
+  },
+  {
+    id: "13",
+    name: "Cohere",
+    website: "https://cohere.com",
+    stage: "Growth",
+    location: "Toronto",
+    industry: "AI",
+  },
+  {
+    id: "14",
+    name: "Rippling",
+    website: "https://rippling.com",
+    stage: "Late",
+    location: "San Francisco",
+    industry: "SaaS",
+  },
+  {
+    id: "15",
+    name: "Figma",
+    website: "https://figma.com",
+    stage: "Late",
+    location: "San Francisco",
+    industry: "Design",
+  },
+  {
+    id: "16",
+    name: "Supabase",
+    website: "https://supabase.com",
+    stage: "Early",
+    location: "Remote",
+    industry: "DevTools",
+  },
+  {
+    id: "17",
+    name: "Runway",
+    website: "https://runwayml.com",
+    stage: "Growth",
+    location: "New York",
+    industry: "AI",
+  },
+  {
+    id: "18",
+    name: "Mercury",
+    website: "https://mercury.com",
+    stage: "Growth",
+    location: "San Francisco",
+    industry: "Fintech",
+  },
+  {
+    id: "19",
+    name: "Notion",
+    website: "https://notion.so",
+    stage: "Late",
+    location: "San Francisco",
+    industry: "Productivity",
+  },
+  {
+    id: "20",
+    name: "Perplexity",
+    website: "https://perplexity.ai",
+    stage: "Early",
+    location: "San Francisco",
+    industry: "AI",
+  },
 ]
