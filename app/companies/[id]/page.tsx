@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
@@ -19,6 +20,15 @@ type Note={
   createdAt:string;
 }
 
+type Enrichment={
+  summary:string[],
+  bullets:string[],
+  keywords: string[]
+  signals: string[]
+  sources: string[]
+  timestamp: string
+}
+
 export default function CompanyProfilePage(){
   const router=useRouter();
   const params=useParams();
@@ -26,13 +36,16 @@ export default function CompanyProfilePage(){
   const [noteInput,setNoteInput]=useState("");
   const [notes,setNotes]=useState<Note[]>([]);
 
+  const [enrichment,setEnrichment]=useState<Enrichment | null>(null);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+
   useEffect(()=>{
     const saved=localStorage.getItem(`notes-${company?.id}`);
     if(!saved) return;
     try{
       const parsed=JSON.parse(saved);
       if(Array.isArray(parsed)){
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setNotes(parsed);
       }
     }catch(err){
@@ -59,6 +72,44 @@ export default function CompanyProfilePage(){
     const updated=notes.filter((n)=>n.id!==id);
     setNotes(updated);
     localStorage.setItem(`notes-${company?.id}`,JSON.stringify(updated));
+  }
+
+  useEffect(()=>{
+    const saved=localStorage.getItem(`enrichment-${company?.id}`);
+    if(!saved) return;
+
+    try{
+      const parsed=JSON.parse(saved);
+      setEnrichment(parsed);
+    }catch{
+      localStorage.removeItem(`enrichment-${company?.id}`)
+    }
+  },[company?.id])
+
+  async function handleEnrich(){
+    if(!company) return;
+
+    setLoading(true);
+    setError("");
+
+    try{
+      const res=await fetch("/api/enrich",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({url:company.website}),
+      })
+      if(!res.ok){
+        throw new Error("Failed to enrich");
+      }
+      const data=await res.json();
+
+      setEnrichment(data);
+      localStorage.setItem(`enrichment-${company.id}`,JSON.stringify(data))
+    }catch(err){
+      setError("Enrichment failed. Please try again.")
+    }finally{
+      setLoading(false);
+    }
   }
 
   if(!company){
@@ -141,8 +192,74 @@ export default function CompanyProfilePage(){
 
       <Card>
         <CardContent className="p-6 space-y-4">
-          <h2 className="text-lg font-medium">AI Enrichment</h2>
-          <Button className="cursor-pointer">Enrich</Button>
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-medium">AI Enrichment</h2>
+
+            {!enrichment && (
+              <Button onClick={handleEnrich} disabled={loading} variant={enrichment ? "outline" : "default"} className="cursor-pointer">
+                {enrichment?"Re-enrich":loading?"Enriching...":"Enrich"}
+              </Button>
+            )}
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
+
+          {loading && (
+            <p className="text-sm text-muted-foreground">Fetching and analyzing website...</p>
+          )}
+
+          {enrichment && (
+            <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{duration:0.35}} className="space-y-6">
+              <div>
+                <h3 className="font-medium mb-2">Summary</h3>
+                <p className="text-sm text-muted-foreground">{enrichment.summary}</p>
+              </div>
+
+              <div>
+                <h3 className="font-medium mb-2">What They Do</h3>
+                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                  {enrichment.bullets.map((b,i)=>(
+                    <li key={i}>{b}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-medium mb-2">Keywords</h3>
+                <div className="flex flex-wrap gap-2">
+                  {enrichment.keywords.map((k,i)=>(
+                    <Badge key={i} variant="outline">{k}</Badge>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-medium mb-2">Derived Signals</h3>
+                <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                  {enrichment.signals.map((s,i)=>(
+                    <li key={i}>{s}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-medium mb-2">Sources</h3>
+                <ul className="text-sm text-muted-foreground space-y-1">
+                  {enrichment.sources.map((src,i)=>(
+                    <li key={i}>
+                      <Link href={src} target="_blank" className="underline">{src}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Enriched on {new Date(enrichment.timestamp).toLocaleString()}
+              </p>
+            </motion.div>
+          )}
         </CardContent>
       </Card>
 
