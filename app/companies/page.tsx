@@ -11,10 +11,16 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
 import { scoreCompany } from "@/lib/scoring";
+import { useRef } from "react";
 
 const PAGE_SIZE=10;
 
 export default function CompaniesPage() {
+
+  const searchRef=useRef<HTMLInputElement|null>(null);
+  const thesisRef=useRef<HTMLInputElement|null>(null);
+  const saveSearchref=useRef<HTMLInputElement|null>(null);
+
   const [search,setSearch]=useState("");
   const [stageFilter,setStageFilter]=useState("All");
   const [industryFilter, setIndustryFilter] = useState("All")
@@ -87,9 +93,18 @@ export default function CompaniesPage() {
 
   useEffect(()=>{
     const handleKey=(e:KeyboardEvent)=>{
-      if(e.key==="/" && document.activeElement?.tagName!=="INPUT"){
+      const activeTag=document.activeElement?.tagName;
+      if(activeTag==="INPUT" || activeTag==="TEXTAREA") return;
+
+      if(e.key==="/"){
         e.preventDefault();
-        document.querySelector("input")?.focus()
+        searchRef.current?.focus();
+      }
+      if(e.key==="s"){
+        saveSearchref.current?.focus();
+      }
+      if(e.key==="t"){
+        thesisRef.current?.focus();
       }
     }
     window.addEventListener("keydown",handleKey);
@@ -132,10 +147,10 @@ export default function CompaniesPage() {
 
       <motion.div initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.3}} className="flex gap-4">
         <div className="relative w-full">
-          <Input placeholder="Search companies..." value={search} onChange={e=>setSearch(e.target.value)}/>
+          <Input ref={searchRef} placeholder="Search companies..." value={search} onChange={e=>setSearch(e.target.value)}/>
         </div>
         <div className="flex gap-2">
-          <Input value={thesis} onChange={(e) => setThesis(e.target.value)} placeholder="Fund thesis (e.g. AI infrastructure, enterprise SaaS...)"/>
+          <Input ref={thesisRef} value={thesis} onChange={(e) => setThesis(e.target.value)} placeholder="Fund thesis (e.g. AI infrastructure, enterprise SaaS...)"/>
           <Button onClick={saveThesis} className="cursor-pointer">Save Thesis</Button>
         </div>
         <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value)}
@@ -166,7 +181,7 @@ export default function CompaniesPage() {
       )}
 
       <div className="flex gap-2">
-        <Input placeholder="Save this search as..." value={searchName} onChange={e=>setSearchName(e.target.value)}/>
+        <Input ref={saveSearchref} placeholder="Save this search as..." value={searchName} onChange={e=>setSearchName(e.target.value)}/>
         <Button onClick={saveSearch}>Save Search</Button>
       </div>
       
