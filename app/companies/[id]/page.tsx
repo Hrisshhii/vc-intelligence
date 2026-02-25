@@ -11,8 +11,10 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Globe, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link";
-import { motion,AnimatePresence } from "framer-motion"
+import { motion,AnimatePresence } from "framer-motion";
 import type { List } from "@/app/lists/page";
+import { Input } from "@/components/ui/input";
+import { ThesisScore } from "../thesis";
 
 type Note={
   id:string;
@@ -20,7 +22,7 @@ type Note={
   createdAt:string;
 }
 
-type Enrichment={
+export type Enrichment={
   summary:string,
   bullets:string[],
   keywords: string[]
@@ -45,6 +47,9 @@ export default function CompanyProfilePage(){
   const [lists,setLists]=useState<List[]>([]);
   const [selectedList,setSelectedList]=useState("");
   const [toast, setToast] = useState<string | null>(null);
+
+  const [thesisInput,setThesisInput]=useState("");
+  const [thesisKeyword,setThesisKeyword]=useState<string[]>([]);
 
   useEffect(()=>{
     const stored=localStorage.getItem("vc-lists");
@@ -278,6 +283,25 @@ export default function CompanyProfilePage(){
           className="fixed bottom-6 right-6 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg">{toast}</motion.div>
         )}
       </AnimatePresence>
+
+      <Card>
+        <CardContent className="p-6 space-y-4">
+          <h2 className="text-lg font-medium">Thesis Match</h2>
+          <div className="flex gap-2">
+            <Input placeholder="Enter thesis keywords (e.g. AI, Enterprise, DevTools)" value={thesisInput} onChange={(e)=>setThesisInput(e.target.value)}/>
+            <Button onClick={()=>{
+              const keywords=thesisInput.split(",").map((k)=>k.trim()).filter(Boolean);
+              setThesisKeyword(keywords);
+            }}
+            className="cursor-pointer"
+            >Apply</Button>
+          </div>
+
+          {thesisKeyword.length>0 && enrichment && (
+            <ThesisScore thesisKeyword={thesisKeyword} enrichment={enrichment}/>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardContent className="p-6 space-y-4">
