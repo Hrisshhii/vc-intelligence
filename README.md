@@ -1,5 +1,4 @@
 # VC Intelligence Interface
-
 A precision AI scouting interface for venture capital firms.
 
 This project was built as a time-boxed take-home assignment to demonstrate:
@@ -10,15 +9,17 @@ This project was built as a time-boxed take-home assignment to demonstrate:
 
 ---
 
-## Product Vision
+## Product Overview
 
-Venture capital sourcing is repetitive, noisy, and thesis-dependent.
+Venture capital sourcing is repetitive, fragmented, and thesis-dependent.
+This project models a simplified precision AI scout workflow:
+    Discover → Open Profile → Enrich → Analyze → Save → Export
 
-This interface models a simplified “precision AI scout” workflow:
-
-Discover → Open Profile → Enrich → Analyze → Save → Export
-
-The goal is to reduce noise, surface high-signal companies, and make enrichment transparent and explainable.
+The goal is to:
+- Reduce noise
+- Surface high-signal companies earlier
+- Make every enrichment transparent and explainable
+- Translate a fund’s thesis into a repeatable discovery workflow
 
 ---
 
@@ -26,22 +27,25 @@ The goal is to reduce noise, surface high-signal companies, and make enrichment 
 
 ### Companies Discovery
 - Search
-- Faceted filters (industry, stage, location)
+- Faceted filters (industry, stage)
 - Sortable table
 - Pagination
+- Thesis-based ranking
+- Keyboard shotcuts (/) to focus search
 
 ### Company Profile
 - Overview
 - Signals timeline (MVP mock)
 - Notes (persisted locally)
 - Save to list
--  Live AI enrichment
+- Live AI enrichment
 - Source transparency with timestamps
+- Cached enrichment
 
 ### Lists
 - Create custom lists
 - Add/remove companies
-- Export as JSON
+- Export as JSON od CSV
 - Persisted in localStorage
 
 ### Saved Searches
@@ -109,10 +113,20 @@ Cached + rendered in UI
 
 The following are stored in `localStorage`:
 
-- Notes
+- Notes per company
 - Lists
 - Saved searches
 - Enrichment cache
 
 No external database required for MVP.
 ---
+
+### Implemented (MVP Focus)
+
+- Full workflow UI
+- Live enrichment
+- Explainable scoring
+- Lists + saved searches
+- CSV/JSON export
+- Caching
+- Server-side enrichment endpoint
