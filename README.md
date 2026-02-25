@@ -1,36 +1,118 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VC Intelligence Interface
 
-## Getting Started
+A precision AI scouting interface for venture capital firms.
 
-First, run the development server:
+This project was built as a time-boxed take-home assignment to demonstrate:
+- Workflow-driven product thinking
+- Live AI enrichment integration
+- Secure server-side architecture
+- Clean, production-quality UI
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Product Vision
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Venture capital sourcing is repetitive, noisy, and thesis-dependent.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This interface models a simplified “precision AI scout” workflow:
 
-## Learn More
+Discover → Open Profile → Enrich → Analyze → Save → Export
 
-To learn more about Next.js, take a look at the following resources:
+The goal is to reduce noise, surface high-signal companies, and make enrichment transparent and explainable.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Features
 
-## Deploy on Vercel
+### Companies Discovery
+- Search
+- Faceted filters (industry, stage, location)
+- Sortable table
+- Pagination
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Company Profile
+- Overview
+- Signals timeline (MVP mock)
+- Notes (persisted locally)
+- Save to list
+-  Live AI enrichment
+- Source transparency with timestamps
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Lists
+- Create custom lists
+- Add/remove companies
+- Export as JSON
+- Persisted in localStorage
+
+### Saved Searches
+- Save search queries
+- Re-run instantly
+- Persisted locally
+
+---
+
+## Live Enrichment
+
+On the company profile page, users can click **Enrich** to:
+
+1. Send the company website to a server endpoint
+2. Fetch public web content
+3. Extract structured intelligence via AI
+4. Display:
+
+- 1–2 sentence summary
+- 3–6 bullet points describing what they do
+- 5–10 keywords
+- 2–4 derived signals (e.g., careers page exists, blog present, changelog detected)
+- Exact URLs scraped
+- Enrichment timestamp
+
+---
+
+## Security & Architecture
+
+Enrichment is handled **server-side** via: /api/enrich
+
+
+- API keys are stored in environment variables
+- Keys are never exposed to the browser
+- Only public pages are accessed
+- No access control bypassing is attempted
+
+Data Flow:
+
+Client  
+↓  
+POST /api/enrich  
+↓  
+Server fetch + AI extraction  
+↓  
+Structured JSON returned  
+↓  
+Cached + rendered in UI  
+
+---
+
+## Tech Stack
+
+- Next.js 14 (App Router)
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- OpenAI API (server-side)
+- LocalStorage for persistence
+- Vercel deployment
+
+---
+
+## Local Persistence
+
+The following are stored in `localStorage`:
+
+- Notes
+- Lists
+- Saved searches
+- Enrichment cache
+
+No external database required for MVP.
+---
