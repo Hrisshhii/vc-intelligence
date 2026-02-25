@@ -15,7 +15,7 @@ export function scoreCompany(
 
   const thesisWords = thesis
     .toLowerCase()
-    .split(",")
+    .split(/[, ]+/)
     .map((w) => w.trim());
 
   let score = 0;
@@ -28,13 +28,13 @@ export function scoreCompany(
   }
 
   // Keyword matches
+  const matchedKeywords = new Set<string>();
   enrichment?.keywords?.forEach((k) => {
     if (thesisWords.some((t) => k.includes(t))) {
-      score += 10;
-      reasons.push(`Keyword match: ${k}`);
+      matchedKeywords.add(k);
     }
   });
-
+  score += matchedKeywords.size * 10;
   // Signal bonus
   enrichment?.signals?.forEach((s) => {
     if (s.toLowerCase().includes("enterprise")) {
