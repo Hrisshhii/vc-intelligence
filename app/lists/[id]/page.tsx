@@ -23,7 +23,7 @@ export default function ListDetailPage(){
     if (!stored) return;
 
     const parsed:List[]=JSON.parse(stored);
-    const found=parsed.find(l=>l.id===params.id);
+    const found=parsed.find(l=>l.id===String(params.id));
     if(found) setList(found);
   },[params.id]);
 
