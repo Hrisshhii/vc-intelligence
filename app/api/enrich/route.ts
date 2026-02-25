@@ -1,3 +1,4 @@
+
 import he from "he";
 
 export async function POST(req: Request) {
@@ -22,6 +23,10 @@ export async function POST(req: Request) {
         { error: "Failed to fetch website content" },
         { status: 400 }
       );
+    }
+
+    if(!url.startsWith("https://")){
+      return Response.json({error:"Only HTTPS allowed"},{status:400});
     }
 
     const html = await res.text();
