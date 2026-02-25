@@ -9,7 +9,7 @@ import { Card,CardContent } from "@/components/ui/card"
 import Link from "next/link";
 import { motion } from "framer-motion"
 
-const PAGE_SIZE=5;
+const PAGE_SIZE=10;
 
 export default function CompaniesPage() {
   const [search,setSearch]=useState("");
@@ -109,7 +109,7 @@ export default function CompaniesPage() {
         </Card>
       ):(
         <div className="rounded-lg border bg-card shadow-sm overflow-hidden">
-          <motion.div key={search+stageFilter+industryFilter+sortField+sortAsc+page} initial={{opacity:0,y:5}} animate={{opacity:1,y:0}} transition={{duration:0.35}} className="max-h-100 overflow-auto">
+          <motion.div key={search+stageFilter+industryFilter+sortField+sortAsc+page} initial={{opacity:0,y:5}} animate={{opacity:1,y:0}} transition={{duration:0.35}} className="max-h-[80%] overflow-auto">
             <Table>
               <TableHeader  className="bg-muted/90 sticky top-0 z-10">
                 <TableRow>

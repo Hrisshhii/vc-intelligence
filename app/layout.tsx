@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "lucide-react";
+import { SideBar } from "@/components/Sidebar";
 
 export const metadata: Metadata = {
   title: "vc- intelligence",
@@ -14,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex">
-        <Sidebar />
+        <SideBar />
         <main className="flex-1 p-8 bg-muted/30 min-h-screen">
           {children}
         </main>

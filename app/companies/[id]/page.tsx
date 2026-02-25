@@ -21,7 +21,7 @@ type Note={
 }
 
 type Enrichment={
-  summary:string[],
+  summary:string,
   bullets:string[],
   keywords: string[]
   signals: string[]
@@ -37,6 +37,8 @@ export default function CompanyProfilePage(){
   const [notes,setNotes]=useState<Note[]>([]);
 
   const [enrichment,setEnrichment]=useState<Enrichment | null>(null);
+  const [cachedEnrichment, setCachedEnrichment] = useState<Enrichment | null>(null);
+  const [hasRequested, setHasRequested] = useState(false)
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
 
@@ -80,7 +82,7 @@ export default function CompanyProfilePage(){
 
     try{
       const parsed=JSON.parse(saved);
-      setEnrichment(parsed);
+      setCachedEnrichment(parsed);
     }catch{
       localStorage.removeItem(`enrichment-${company?.id}`)
     }
@@ -91,6 +93,7 @@ export default function CompanyProfilePage(){
 
     setLoading(true);
     setError("");
+    setHasRequested(true);
 
     try{
       const res=await fetch("/api/enrich",{
@@ -104,6 +107,7 @@ export default function CompanyProfilePage(){
       const data=await res.json();
 
       setEnrichment(data);
+      setCachedEnrichment(data);
       localStorage.setItem(`enrichment-${company.id}`,JSON.stringify(data))
     }catch(err){
       setError("Enrichment failed. Please try again.")
@@ -195,11 +199,15 @@ export default function CompanyProfilePage(){
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-medium">AI Enrichment</h2>
 
-            {!enrichment && (
-              <Button onClick={handleEnrich} disabled={loading} variant={enrichment ? "outline" : "default"} className="cursor-pointer">
-                {enrichment?"Re-enrich":loading?"Enriching...":"Enrich"}
-              </Button>
-            )}
+            <div className="flex gap-2">
+              <Button onClick={handleEnrich} disabled={loading} className="cursor-pointer">{loading?"Enriching...":enrichment?"Re-enrich":"Enrich"}</Button>
+              {cachedEnrichment && !hasRequested && (
+                <Button variant="outline" onClick={()=>{
+                  setEnrichment(cachedEnrichment);
+                  setHasRequested(true);
+                }}>View Previous</Button>
+              )}
+            </div>
           </div>
 
           {error && (
