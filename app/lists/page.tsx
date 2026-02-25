@@ -56,6 +56,19 @@ export default function ListPage(){
     a.click();
   }
 
+  function exportCSV(list:List){
+    const header="Company ID\n";
+    const rows=list.companies.map(id=>`${id}`).join("\n");
+    const csvContent=header+rows;
+
+    const blob=new Blob([csvContent],{type:"text/csv"});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=`${list.name}.csv`;
+    a.click();
+  }
+
   return (
     <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{duration:0.25}} className="space-y-8">
       <h1 className="text-2xl font-semibold">Lists</h1>
@@ -83,7 +96,10 @@ export default function ListPage(){
               <Link href={`/lists/${list.id}`}>
                 <Button variant="outline" className="cursor-pointer" size="sm">Open</Button>
               </Link>
-              <Button size="sm" variant="outline" className="cursor-pointer" onClick={()=>exportJSON(list)}>Export</Button>
+              <div className="flex gap-1">
+                <Button size="sm" variant="outline" className="cursor-pointer" onClick={()=>exportJSON(list)}>EXPORT-JSON</Button>
+                <Button size="sm" variant="outline" className="cursor-pointer" onClick={()=>exportCSV(list)}>EXPORT-CSV</Button>
+              </div>
               <Button size="sm" variant="destructive" className="cursor-pointer" onClick={()=>deleteList(list.id)}>Delete</Button>
             </div>
           </div>
