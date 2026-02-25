@@ -10,6 +10,7 @@ import { Card,CardContent } from "@/components/ui/card"
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+import { scoreCompany } from "@/lib/scoring";
 
 const PAGE_SIZE=10;
 
@@ -22,6 +23,17 @@ export default function CompaniesPage() {
   const [page,setPage]=useState(1);
   const [searchName, setSearchName] = useState("");
   const searchParams = useSearchParams();
+
+  const [thesis,setThesis]=useState("");
+
+  useEffect(()=>{
+    const stored=localStorage.getItem("vc-thesis");
+    if(stored) setThesis(stored);
+  },[]);
+
+  function saveThesis(){
+    localStorage.setItem("vc-thesis",thesis);
+  }
 
   useEffect(()=>{
     setPage(1)
@@ -38,16 +50,28 @@ export default function CompaniesPage() {
     if(industryFilter!=="All"){
       data=data.filter(c=>c.industry.toLowerCase()===industryFilter.toLowerCase())
     }
-    data.sort((a,b)=>{
-      const valA=a[sortField];
-      const valB=b[sortField];
+    if(thesis){
+      data.sort((a, b)=>{
+        const enrichmentA = JSON.parse(localStorage.getItem(`enrichment-${a.id}`) || "null");
+        const enrichmentB = JSON.parse(localStorage.getItem(`enrichment-${b.id}`) || "null");
+        const scoreA = scoreCompany(thesis, enrichmentA, a.industry).score;
+        const scoreB = scoreCompany(thesis, enrichmentB, b.industry).score;
 
-      if(valA<valB) return sortAsc?-1:1;
-      if (valA>valB) return sortAsc?1:-1;
-      return 0;
-    })
+        return scoreB - scoreA;
+      });
+    }else{
+        data.sort((a,b)=>{
+        const valA=a[sortField];
+        const valB=b[sortField];
+
+        if(valA<valB) return sortAsc?-1:1;
+        if (valA>valB) return sortAsc?1:-1;
+        return 0;
+      });
+    }
+    
     return data;
-  },[search,stageFilter,sortField,sortAsc,industryFilter]);
+  },[search,stageFilter,sortField,sortAsc,industryFilter,thesis]);
 
   const totalPages=Math.ceil(filtered.length/PAGE_SIZE);
   const paginated=filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
@@ -110,6 +134,10 @@ export default function CompaniesPage() {
         <div className="relative w-full">
           <Input placeholder="Search companies..." value={search} onChange={e=>setSearch(e.target.value)}/>
         </div>
+        <div className="flex gap-2">
+          <Input value={thesis} onChange={(e) => setThesis(e.target.value)} placeholder="Fund thesis (e.g. AI infrastructure, enterprise SaaS...)"/>
+          <Button onClick={saveThesis} className="cursor-pointer">Save Thesis</Button>
+        </div>
         <select value={stageFilter} onChange={(e) => setStageFilter(e.target.value)}
           className="border rounded-md px-3 py-2 text-sm cursor-pointer"
         >
@@ -124,6 +152,12 @@ export default function CompaniesPage() {
           <option>DevTools</option>
         </select>
       </motion.div>
+
+      {thesis && (
+        <p className="text-xs text-muted-foreground">
+          Companies ranked by thesis alignment.
+        </p>
+      )}
       
       {isFiltering && filtered.length !== 0 && (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -153,19 +187,39 @@ export default function CompaniesPage() {
                   <TableHead onClick={()=>handleSort("industry")} className="p-2 text-[1.25rem] font-bold text-foreground tracking-wide uppercase cursor-pointer">Industry {sortField==="industry" && (sortAsc?"↑":"↓")}</TableHead>
                   <TableHead className="p-2 text-[1.25rem] font-bold tracking-wide uppercase text-foreground">Stage</TableHead>
                   <TableHead className="p-2 text-[1.25rem] font-bold tracking-wide uppercase text-foreground">Location</TableHead>
+                  <TableHead className="p-2 text-[1.25rem] font-bold tracking-wide uppercase text-foreground">SCORE</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginated.map(company=>(
-                  <TableRow key={company.id} className="text-[1.15rem] hover:bg-muted/40 transition-colors border-b last:border-0">
-                    <TableCell>
-                      <Link href={`/companies/${company.id}`} className="font-medium hover:underline">{company.name}</Link>
-                    </TableCell>
-                    <TableCell>{company.industry}</TableCell>
-                    <TableCell>{company.stage}</TableCell>
-                    <TableCell>{company.location}</TableCell>
-                  </TableRow>
-                ))}
+                {paginated.map(company => {
+                  const enrichment=JSON.parse(localStorage.getItem(`enrichment-${company.id}`)||"null");
+                  const result=scoreCompany(thesis,enrichment,company.industry);
+
+                  return (
+                    <TableRow key={company.id} className="text-[1.15rem] hover:bg-muted/40 transition-colors border-b last:border-0">
+                      <TableCell>
+                        <Link href={`/companies/${company.id}`} className="font-medium hover:underline">
+                          {company.name}
+                        </Link>
+                      </TableCell>
+
+                      <TableCell>{company.industry}</TableCell>
+                      <TableCell>{company.stage}</TableCell>
+                      <TableCell>{company.location}</TableCell>
+
+                      <TableCell>
+                        <span className={`font-semibold ${
+                            result.score>70?"text-green-600"
+                              :result.score>40?"text-yellow-600"
+                              :"text-muted-foreground"
+                          }`}
+                        >
+                          {thesis ? result.score : "-"}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </motion.div>

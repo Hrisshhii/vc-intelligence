@@ -45,10 +45,6 @@ export function SideBar() {
           );
         })}
       </nav>
-
-      <div className="mt-auto text-xs text-muted-foreground">
-        v1.0 MVP
-      </div>
     </div>
   );
 }
