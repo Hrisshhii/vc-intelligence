@@ -9,6 +9,11 @@ This project was built as a time-boxed take-home assignment to demonstrate:
 
 ---
 
+## DEMO:
+Deployment: vc-intelligence-kappa.vercel.app
+
+---
+
 ## Product Overview
 
 Venture capital sourcing is repetitive, fragmented, and thesis-dependent.
