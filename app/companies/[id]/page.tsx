@@ -109,7 +109,7 @@ export default function CompanyProfilePage(){
       setEnrichment(data);
       setCachedEnrichment(data);
       localStorage.setItem(`enrichment-${company.id}`,JSON.stringify(data))
-    }catch(err){
+    }catch{
       setError("Enrichment failed. Please try again.")
     }finally{
       setLoading(false);
@@ -156,9 +156,22 @@ export default function CompanyProfilePage(){
       <Card>
         <CardContent className="p-6 space-y-4">
           <h2 className="text-lg font-medium">Overview</h2>
-          <p className="text-sm text-muted-foreground">
-            This section will display enrich summary once available.
-          </p>
+          {enrichment ? (
+            <motion.p initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="text-sm text-muted-foreground leading-relaxed"
+            >
+              {enrichment.summary}
+            </motion.p>
+          ):(
+            <div className="text-sm text-muted-foreground flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                This section will display enrich summary once available.
+              </p>
+            </div>
+            
+          )}
         </CardContent>
       </Card>
 
@@ -170,7 +183,7 @@ export default function CompanyProfilePage(){
 
           {notes.length === 0 && (
             <p className="text-sm text-muted-foreground mt-2">
-              No internal notes yet.
+              No internal notes yet. Add insights, thesis alignment, or red flags.
             </p>
           )}
 
@@ -221,8 +234,8 @@ export default function CompanyProfilePage(){
           {enrichment && (
             <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{duration:0.35}} className="space-y-6">
               <div>
-                <h3 className="font-medium mb-2">Summary</h3>
-                <p className="text-sm text-muted-foreground">{enrichment.summary}</p>
+                <h3 className="font-medium text-[1.25rem] mb-2">Summary</h3>
+                <p className="text-base text-foreground leading-relaxed">{enrichment.summary}</p>
               </div>
 
               <div>
