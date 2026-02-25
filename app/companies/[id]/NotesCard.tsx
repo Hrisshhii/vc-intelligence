@@ -14,7 +14,7 @@ type Note = {
   createdAt: string;
 };
 
-export function NotesCard({ companyId }: { companyId: string | number }) {
+export function NotesCard({ companyId,textareaRef }: { companyId: string | number; textareaRef?: React.RefObject<HTMLTextAreaElement|null> }) {
   const [noteInput, setNoteInput] = useState("");
   const [notes, setNotes] = useState<Note[]>([]);
 
@@ -55,7 +55,7 @@ export function NotesCard({ companyId }: { companyId: string | number }) {
     <Card>
         <CardContent className="p-6 space-y-4">
           <h2 className="text-lg font-medium">Notes</h2>
-          <Textarea placeholder="Add internal notes..." value={noteInput} onChange={e=>setNoteInput(e.target.value)}/>
+          <Textarea ref={textareaRef} placeholder="Add internal notes..." value={noteInput} onChange={e=>setNoteInput(e.target.value)}/>
           <Button onClick={handleAddNote} className="cursor-pointer">Add Notes</Button>
 
           {notes.length === 0 && (

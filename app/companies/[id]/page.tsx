@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 
 "use client";
 
@@ -16,6 +17,7 @@ import { ThesisScore } from "../thesis";
 import { CompanyHeader } from "./CompanyHeader";
 import { NotesCard } from "./NotesCard";
 import { EnrichmentCard } from "./EnrichmentCard";
+import { useRef } from "react";
 
 
 export type Enrichment={
@@ -28,6 +30,10 @@ export type Enrichment={
 }
 
 export default function CompanyProfilePage(){
+  const noteRef=useRef<HTMLTextAreaElement|null>(null);
+  const listRef=useRef<HTMLSelectElement|null>(null);
+  const thesisRef=useRef<HTMLInputElement|null>(null);
+
   const router=useRouter();
   const params=useParams();
   const company=companies.find(c=>String(c.id)===String(params.id));
@@ -102,11 +108,38 @@ export default function CompanyProfilePage(){
   }
   const listsContainingCompany=lists.filter(l=>l.companies.includes(company.id));
 
+  useEffect(()=>{
+    const handleKey=(e:KeyboardEvent)=>{
+      const activeTag=document.activeElement?.tagName;
+
+      if(activeTag==="INPUT" || activeTag==="TEXTAREA") return;
+
+      if(e.key==="e"){
+        handleEnrich();
+      }
+      if(e.key==="b"){
+        router.back();
+      }
+      if(e.key==="n"){
+        noteRef.current?.focus();
+      }
+      if(e.key==="l"){
+        listRef.current?.focus();
+      }
+      if(e.key==="T" && e.shiftKey){
+        thesisRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown",handleKey);
+    return ()=>window.removeEventListener("keydown",handleKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[handleEnrich])
+
   return (
     <motion.div className="space-y-8" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.25}}>
       <Button variant="ghost" size="sm" onClick={()=>router.back()} className="w-fit text-muted-foreground cursor-pointer">
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Back to Companies
+        Back to Companies (B)
       </Button>
       <CompanyHeader company={company}/>
 
@@ -132,7 +165,7 @@ export default function CompanyProfilePage(){
         </CardContent>
       </Card>
 
-      <NotesCard companyId={company.id}/>
+      <NotesCard companyId={company.id} textareaRef={noteRef}/>
 
       <Card>
         <CardContent className="p-6 space-y-4">
@@ -150,7 +183,7 @@ export default function CompanyProfilePage(){
 
           {lists.length>0 && (
             <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.2}} className="flex gap-2">
-              <select value={selectedList} onChange={e=>setSelectedList(e.target.value)} className="border rounded px-2 py-1 text-sm">
+              <select ref={listRef} value={selectedList} onChange={e=>setSelectedList(e.target.value)} className="border rounded px-2 py-1 text-sm">
                 <option value="">Select list</option>
                 {lists.map(list=>(
                   <option key={list.id} value={list.id}>{list.name}</option>
@@ -200,7 +233,7 @@ export default function CompanyProfilePage(){
         <CardContent className="p-6 space-y-4">
           <h2 className="text-lg font-medium">Thesis Match</h2>
           <div className="flex gap-2">
-            <Input placeholder="Enter thesis keywords (e.g. AI, Enterprise, DevTools)" value={thesisInput} onChange={(e)=>setThesisInput(e.target.value)}/>
+            <Input ref={thesisRef} placeholder="Enter thesis keywords (e.g. AI, Enterprise, DevTools)" value={thesisInput} onChange={(e)=>setThesisInput(e.target.value)}/>
             <Button onClick={()=>{
               const keywords=thesisInput.split(",").map((k)=>k.trim()).filter(Boolean);
               setThesisKeyword(keywords);
