@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { motion } from "framer-motion"
 
-type List = {
+export type List = {
   id: string;
   name: string;
   companies: string[];
@@ -56,7 +57,7 @@ export default function ListPage(){
   }
 
   return (
-    <div className="space-y-8">
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} transition={{duration:0.25}} className="space-y-8">
       <h1 className="text-2xl font-semibold">Lists</h1>
 
       <div className="flex gap-2">
@@ -70,7 +71,7 @@ export default function ListPage(){
 
       <div className="space-y-4">
         {lists.map(list=>(
-          <div key={list.id} className="border rounded-lg p-4 flex justify-between items center">
+          <div key={list.id} className="border rounded-lg p-4 flex justify-between items-center">
             <div>
               <h2 className="font-medium">{list.name}</h2>
               <p className="text-xs text-muted-foreground">
@@ -88,6 +89,6 @@ export default function ListPage(){
           </div>
         ))}
       </div>
-    </div>
+    </motion.div>
   )
 }

@@ -13,6 +13,7 @@ import { ArrowLeft, Globe, Trash2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link";
 import { motion,AnimatePresence } from "framer-motion"
+import type { List } from "@/app/lists/page";
 
 type Note={
   id:string;
@@ -41,6 +42,15 @@ export default function CompanyProfilePage(){
   const [hasRequested, setHasRequested] = useState(false)
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
+
+  const [lists,setLists]=useState<List[]>([]);
+  const [selectedList,setSelectedList]=useState("");
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(()=>{
+    const stored=localStorage.getItem("vc-lists");
+    if(stored) setLists(JSON.parse(stored));
+  },[])
 
   useEffect(()=>{
     const saved=localStorage.getItem(`notes-${company?.id}`);
@@ -119,6 +129,7 @@ export default function CompanyProfilePage(){
   if(!company){
     return <div>Company not found</div>
   }
+  const listsContainingCompany=lists.filter(l=>l.companies.includes(company.id));
 
   return (
     <motion.div className="space-y-8" initial={{opacity:0,y:10}} animate={{opacity:1,y:0}} transition={{duration:0.25}}>
@@ -206,6 +217,68 @@ export default function CompanyProfilePage(){
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardContent className="p-6 space-y-4">
+          <h2 className="text-lg font-medium">Save to List</h2>
+          {listsContainingCompany.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {listsContainingCompany.map(list=>(
+                <Badge key={list.id} variant="secondary">In: {list.name}</Badge>
+              ))}
+            </div>
+          )}
+          {lists.length ===0 && (
+            <p className="text-sm text-muted-foreground">Create a list first</p>
+          )}
+
+          {lists.length>0 && (
+            <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}} transition={{duration:0.2}} className="flex gap-2">
+              <select value={selectedList} onChange={e=>setSelectedList(e.target.value)} className="border rounded px-2 py-1 text-sm">
+                <option value="">Select list</option>
+                {lists.map(list=>(
+                  <option key={list.id} value={list.id}>{list.name}</option>
+                ))}
+              </select>
+
+              <Button className="cursor-pointer" onClick={()=>{
+                if(!selectedList) return;
+
+                const targetList = lists.find(l => l.id === selectedList);
+                if (!targetList) return;
+
+                if(targetList.companies.includes(company.id)){
+                  setToast(`Already in ${targetList.name}`);
+                  setTimeout(() => setToast(null), 2000);
+                  return;
+                }
+
+                const updated=lists.map(l=>{
+                  if(l.id===selectedList){
+                    return {...l,
+                      companies: [...l.companies, company.id],
+                    };
+                  }
+                  return l;
+                });
+                localStorage.setItem("vc-lists", JSON.stringify(updated));
+                setLists(updated);
+
+                setToast(`Saved to ${targetList.name}`);
+                setSelectedList("");
+                setTimeout(() => setToast(null), 2000);
+              }}>Save</Button>
+            </motion.div>
+          )}
+        </CardContent>
+      </Card>
+
+      <AnimatePresence>
+        {toast && (
+          <motion.div initial={{opacity:0,y:20}} animate={{opacity:1,y:0}} exit={{opacity:0,y:20}} transition={{duration:0.2}}
+          className="fixed bottom-6 right-6 bg-black text-white text-sm px-4 py-2 rounded-lg shadow-lg">{toast}</motion.div>
+        )}
+      </AnimatePresence>
 
       <Card>
         <CardContent className="p-6 space-y-4">
