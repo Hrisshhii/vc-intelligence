@@ -9,7 +9,7 @@ export function ThesisScore({thesisKeyword,enrichment}:{thesisKeyword:string[];e
 
   const score=matched.length;
   const total=thesisKeyword.length;
-  const percentage=Math.round((score/total)*100);
+  const percentage=total===0 ? 0 : Math.round((score/total)*100);
 
   return(
     <motion.div initial={{opacity:0}} animate={{opacity:1}} className="space-y-4">

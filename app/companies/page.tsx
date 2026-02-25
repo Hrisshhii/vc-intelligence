@@ -73,7 +73,7 @@ export default function CompaniesPage() {
     return data;
   },[search,stageFilter,sortField,sortAsc,industryFilter,thesis]);
 
-  const totalPages=Math.ceil(filtered.length/PAGE_SIZE);
+  const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
   const paginated=filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
 
   function handleSort(field:keyof Company){
